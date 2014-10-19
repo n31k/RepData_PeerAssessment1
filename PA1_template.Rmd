@@ -25,6 +25,7 @@ act$wdayn <- dtime$wday
 ## What is mean total number of steps taken per day?
 ```{r, echo = TRUE}
 act_bu <- act
+	# Backing up the original dataset for convenience. 
 act <- act[complete.cases(act),]
 tapply(act$steps, act$wdayn, mean)
 ```
@@ -42,8 +43,8 @@ plot(x~interv, data = actint, type = 'l',
 ## Imputing missing values
 
 ```{r}
-na_rows <- apply(act, 1, function (x) sum(is.na(x)) )
-na_cols <- apply(act, 2, function (x) sum(is.na(x)) )
+na_rows <- apply(act_bu, 1, function (x) sum(is.na(x)) )
+na_cols <- apply(act_bu, 2, function (x) sum(is.na(x)) )
 ```
 With the following call I assess whether there are rows that
 have more than one missing value. 

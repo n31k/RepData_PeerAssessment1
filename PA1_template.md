@@ -27,6 +27,7 @@ act$wdayn <- dtime$wday
 
 ```r
 act_bu <- act
+	# Backing up the original dataset for convenience. 
 act <- act[complete.cases(act),]
 tapply(act$steps, act$wdayn, mean)
 ```
@@ -53,8 +54,8 @@ plot(x~interv, data = actint, type = 'l',
 
 
 ```r
-na_rows <- apply(act, 1, function (x) sum(is.na(x)) )
-na_cols <- apply(act, 2, function (x) sum(is.na(x)) )
+na_rows <- apply(act_bu, 1, function (x) sum(is.na(x)) )
+na_cols <- apply(act_bu, 2, function (x) sum(is.na(x)) )
 ```
 With the following call I assess whether there are rows that
 have more than one missing value. 
@@ -75,7 +76,7 @@ head(na_cols)
 
 ```
 ##    steps     date interval  weekday    wdayn 
-##        0        0        0        0        0
+##     2304        0        0        0        0
 ```
 This is the number of missing values.
 
@@ -85,7 +86,7 @@ na_cols['steps']
 
 ```
 ## steps 
-##     0
+##  2304
 ```
 Get interval Means
 

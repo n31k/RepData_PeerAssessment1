@@ -218,6 +218,7 @@ act$wdayn &lt;- dtime$wday
 <h2>What is mean total number of steps taken per day?</h2>
 
 <pre><code class="r">act_bu &lt;- act
+    # Backing up the original dataset for convenience. 
 act &lt;- act[complete.cases(act),]
 tapply(act$steps, act$wdayn, mean)
 </code></pre>
@@ -238,8 +239,8 @@ plot(x~interv, data = actint, type = &#39;l&#39;,
 
 <h2>Imputing missing values</h2>
 
-<pre><code class="r">na_rows &lt;- apply(act, 1, function (x) sum(is.na(x)) )
-na_cols &lt;- apply(act, 2, function (x) sum(is.na(x)) )
+<pre><code class="r">na_rows &lt;- apply(act_bu, 1, function (x) sum(is.na(x)) )
+na_cols &lt;- apply(act_bu, 2, function (x) sum(is.na(x)) )
 </code></pre>
 
 <p>With the following call I assess whether there are rows that
@@ -257,7 +258,7 @@ have more than one missing value. </p>
 </code></pre>
 
 <pre><code>##    steps     date interval  weekday    wdayn 
-##        0        0        0        0        0
+##     2304        0        0        0        0
 </code></pre>
 
 <p>This is the number of missing values.</p>
@@ -266,7 +267,7 @@ have more than one missing value. </p>
 </code></pre>
 
 <pre><code>## steps 
-##     0
+##  2304
 </code></pre>
 
 <p>Get interval Means</p>
