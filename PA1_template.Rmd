@@ -18,27 +18,55 @@ act$weekday <- weekdays(dtime)
 	# Save date as weekday in data frame.
 act$wdayn <- dtime$wday
 	# Save date as weekday NUMBER in data frame.
+	
+actls <- split(act, act$date)
+	# A list of data frame, one for each date. 
+acttot <- lapply(actls, function(x) { 
+	data.frame(steps = sum(x$steps),
+			date = x[[2]][1],
+			weekday = x$weekday[1],
+				wdayn = x$wdayn[1])
+	})
+acttot <- Reduce(rbind, acttot)
+	# Creating a data frame with total steps for each date.
+acttot_bu <- acttot
+	# And backing it up.
+
+
 ```
 
 
 
 ## What is mean total number of steps taken per day?
 ```{r, echo = TRUE}
-act_bu <- act
-	# Backing up the original dataset for convenience. 
-act <- act[complete.cases(act),]
-tapply(act$steps, act$wdayn, mean)
+acttot <- acttot_bu[complete.cases(acttot_bu), ]
+	# Retaining only complete cases (some dates are empty!).
+hist(acttot$steps, main = 'Total Number of Steps per Day', xlab = 'N of Steps')
+	# Plotting total n of steps per day. 
+step_mean <- mean(acttot$steps)
+step_med <- quantile(acttot$steps, 0.5)
 ```
+The **mean** total number of steps across all dates is `r step_mean`
+and the **median** `r step_med`.
+
 
 
 ## What is the average daily activity pattern?
 
 ```{r, echo = TRUE}
+act_bu <- act
+	# Backing up orginal data set for convenience.
+act <- act[complete.cases(act), ]
+	# Keeping only rows with non-missing values.
 actint <- aggregate(act[, c('steps')], list(interv = act[,'interval']), mean)
-
+	# Averaging n of steps across dates.
 plot(x~interv, data = actint, type = 'l', 
-	xlab = 'Time Interval', ylab = 'Average N of Steps Across Week Days')
+	xlab = 'Time Interval', ylab = 'Average N of Steps Across Days')
+max_int <- actint[which(actint$x == max(actint$x)), 'interv']
 ```
+
+The time interval with the **maximum** number of steps, across all dates is `r max_int`.
+
 
 ## Imputing missing values
 
@@ -60,7 +88,7 @@ This is the number of missing values.
 ```{r}
 na_cols['steps']
 ```
-Get interval Means
+Get **interval** Means, to replace missing values.
 
 ```{r}
 act <- act_bu[complete.cases(act_bu),]
@@ -72,6 +100,7 @@ interval_means <- by(act[, c('interval', 'steps')], act[, 'interval'], function(
 In place replacements only with FOR LOOPS!! See [Advanced R](http://adv-r.had.co.nz/Functionals.html#functionals-not) for details. 
 ```{r}
 act2 <- act_bu
+	# Restoring the original data set with the missing values. 
 for (i in 1:nrow(act2) ){
 	if (is.na(act2[i, 'steps'])){
 		xint <- as.character( act2[i, 'interval'] )
@@ -79,7 +108,39 @@ for (i in 1:nrow(act2) ){
 			}
 	}
 
+actls <- split(act2, act$date)
+acttot <- lapply(actls, function(x) { 
+	data.frame(steps = sum(x$steps),
+			date = x[[2]][1],
+			weekday = x$weekday[1],
+				wdayn = x$wdayn[1])
+	})
+acttot <- Reduce(rbind, acttot)
+	# Creating a data frame with total steps for each date.
+acttot_bu <- acttot
+	# And backing it up.
+
 ```
+Here is a histogram of the total number of steps after imputting missing values.
+```{r, echo = TRUE}
+
+hist(acttot$steps, main = 'Total Number of Steps per Day', xlab = 'N of Steps')
+	# Plotting total n of steps per day. 
+step_mean <- mean(acttot$steps)
+step_med <- quantile(acttot$steps, 0.5)
+```
+The **mean** total number of steps across all dates is `r step_mean`
+and the **median** `r step_med`.
+
+Due to the majority of values been zero, imputing the mean as a replacement for NA's, 
+increases the frequency of lower values. This is so because the means are affected (specifically 
+attenuated) by extreme values in the lower end. One can assert that the majority of values is zero
+thusly:
+```{r}
+mean(act_bu$steps == 0, na.rm = T)*100
+	# This gives the percentage of TRUE values. 
+```
+
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r}
